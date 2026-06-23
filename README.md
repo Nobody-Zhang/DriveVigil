@@ -2,7 +2,7 @@
 
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/Python-3.8+-green.svg)](https://www.python.org/)
-[![Lint](https://github.com/Nobody-Zhang/huaweicloud_2023/actions/workflows/lint.yml/badge.svg)](https://github.com/Nobody-Zhang/huaweicloud_2023/actions/workflows/lint.yml)
+[![CI](https://github.com/Nobody-Zhang/DriveVigil/actions/workflows/lint.yml/badge.svg)](https://github.com/Nobody-Zhang/DriveVigil/actions/workflows/lint.yml)
 
 **Award-winning fatigue driving detection system with cloud-edge collaboration between Huawei Cloud ModelArts and NVIDIA Jetson TX2 NX.**
 
@@ -55,8 +55,8 @@ graph TB
 ## Quick Start
 
 ```bash
-git clone https://github.com/Nobody-Zhang/huaweicloud_2023.git
-cd huaweicloud_2023
+git clone https://github.com/Nobody-Zhang/DriveVigil.git
+cd DriveVigil
 pip install -r requirements.txt
 bash scripts/download_assets.sh
 
@@ -70,10 +70,34 @@ cd edge/deepstream && sudo make && ./deepstream-customized
 cd edge/watchdog && mkdir build && cd build && cmake .. && make
 ```
 
+## Development
+
+Tooling targets **Python 3.8** (the cloud code deploys to ModelArts on Python
+3.7). Work inside a virtual environment:
+
+```bash
+python -m venv .venv && source .venv/bin/activate
+pip install -r requirements-dev.txt
+```
+
+Lint, format, and test — all gated in CI:
+
+```bash
+ruff check .            # lint    (ruff check --fix .  to auto-fix)
+ruff format --check .   # format  (ruff format .       to apply)
+pytest                  # unit tests for the core classifier + geometry helpers
+```
+
+The test suite exercises the pure, hardware-free logic (the per-frame
+`YOLO_Status` classifier and its helpers) and needs **no GPU, cloud credentials,
+or downloaded assets**. See [CONTRIBUTING.md](CONTRIBUTING.md) for the full guide
+— vendored-tree boundaries, the Python 3.7/3.8 split, and the near-duplicate
+cloud variants.
+
 ## Project Structure
 
 ```
-huaweicloud_2023/
+DriveVigil/
 ├── cloud/
 │   ├── baseline/          # PyTorch + dlib baseline
 │   ├── preliminary/       # Best score (0.9741) — divide-and-conquer algorithm
@@ -109,7 +133,7 @@ huaweicloud_2023/
                Xingyu Chen and Jintian Wu and Yufan Jia and Zheyu Zhou and
                Jiahao Zhang and Jinshen Zhang},
     year    = {2023},
-    url     = {https://github.com/Nobody-Zhang/huaweicloud_2023}
+    url     = {https://github.com/Nobody-Zhang/DriveVigil}
 }
 ```
 

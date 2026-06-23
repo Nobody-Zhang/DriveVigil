@@ -1,0 +1,39 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "Fatigue Driving Detection: Cloud-Edge Collaboration"
+abstract: >-
+  Award-winning fatigue / distracted-driving detection system with cloud-edge
+  collaboration between Huawei Cloud ModelArts and an NVIDIA Jetson TX2 NX,
+  built for the Huawei Cloud track of the 18th Challenge Cup.
+type: software
+authors:
+  - family-names: Zhang
+    given-names: Gongbo
+  - family-names: Guo
+    given-names: Shuming
+  - family-names: Lv
+    given-names: Luran
+  - family-names: Zhang
+    given-names: Aolin
+  - family-names: Chen
+    given-names: Xingyu
+  - family-names: Wu
+    given-names: Jintian
+  - family-names: Jia
+    given-names: Yufan
+  - family-names: Zhou
+    given-names: Zheyu
+  - family-names: Zhang
+    given-names: Jiahao
+  - family-names: Zhang
+    given-names: Jinshen
+repository-code: "https://github.com/Nobody-Zhang/DriveVigil"
+url: "https://github.com/Nobody-Zhang/DriveVigil"
+license: Apache-2.0
+keywords:
+  - fatigue-driving-detection
+  - cloud-edge-collaboration
+  - YOLOv5
+  - DeepStream
+  - Huawei Cloud ModelArts
+  - Jetson

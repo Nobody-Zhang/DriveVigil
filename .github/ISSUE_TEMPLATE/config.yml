@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: 📖 Documentation
+    url: https://github.com/Nobody-Zhang/DriveVigil#readme
+    about: Read the README, architecture overview, and docs/ASSETS.md first.
+  - name: 💬 Questions & discussion
+    url: https://github.com/Nobody-Zhang/DriveVigil/discussions
+    about: Ask how the cloud-edge system works, or share what you built.

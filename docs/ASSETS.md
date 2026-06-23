@@ -1,6 +1,6 @@
 # Large Binary Assets
 
-This repository uses [GitHub Releases](https://github.com/Nobody-Zhang/huaweicloud_2023/releases/tag/v1.0) to host large binary files that are not tracked in git.
+This repository uses [GitHub Releases](https://github.com/Nobody-Zhang/DriveVigil/releases/tag/v1.0) to host large binary files that are not tracked in git.
 
 ## Quick Start
 

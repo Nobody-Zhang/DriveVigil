@@ -2,7 +2,7 @@
 
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/Python-3.8+-green.svg)](https://www.python.org/)
-[![Lint](https://github.com/Nobody-Zhang/huaweicloud_2023/actions/workflows/lint.yml/badge.svg)](https://github.com/Nobody-Zhang/huaweicloud_2023/actions/workflows/lint.yml)
+[![CI](https://github.com/Nobody-Zhang/DriveVigil/actions/workflows/lint.yml/badge.svg)](https://github.com/Nobody-Zhang/DriveVigil/actions/workflows/lint.yml)
 
 **基于华为云 ModelArts 与 NVIDIA Jetson TX2 NX 的云边协同疲劳驾驶检测系统。**
 
@@ -55,8 +55,8 @@ graph TB
 ## 快速开始
 
 ```bash
-git clone https://github.com/Nobody-Zhang/huaweicloud_2023.git
-cd huaweicloud_2023
+git clone https://github.com/Nobody-Zhang/DriveVigil.git
+cd DriveVigil
 pip install -r requirements.txt
 bash scripts/download_assets.sh
 
@@ -70,10 +70,29 @@ cd edge/deepstream && sudo make && ./deepstream-customized
 cd edge/watchdog && mkdir build && cd build && cmake .. && make
 ```
 
+## 开发
+
+工具链以 **Python 3.8** 为目标（云端代码部署在 ModelArts 的 Python 3.7 上）。请在虚拟环境中开发：
+
+```bash
+python -m venv .venv && source .venv/bin/activate
+pip install -r requirements-dev.txt
+```
+
+代码检查、格式化与测试（均为 CI 门禁）：
+
+```bash
+ruff check .            # 检查    （ruff check --fix .  自动修复）
+ruff format --check .   # 格式化  （ruff format .       应用格式化）
+pytest                  # 核心分类器与几何辅助函数的单元测试
+```
+
+测试套件仅覆盖纯逻辑（逐帧 `YOLO_Status` 分类器及其辅助函数），**无需 GPU、云凭证或下载的资源文件**。完整贡献指南（vendored 目录边界、Python 3.7/3.8 差异、近重复的云端变体）见 [CONTRIBUTING.md](CONTRIBUTING.md)。
+
 ## 项目结构
 
 ```
-huaweicloud_2023/
+DriveVigil/
 ├── cloud/
 │   ├── baseline/          # PyTorch + dlib 基线方案
 │   ├── preliminary/       # 初赛最优方案（0.9741）— 分治算法
@@ -109,7 +128,7 @@ huaweicloud_2023/
                Xingyu Chen and Jintian Wu and Yufan Jia and Zheyu Zhou and
                Jiahao Zhang and Jinshen Zhang},
     year    = {2023},
-    url     = {https://github.com/Nobody-Zhang/huaweicloud_2023}
+    url     = {https://github.com/Nobody-Zhang/DriveVigil}
 }
 ```
 
@@ -120,10 +139,10 @@ huaweicloud_2023/
 ## 致谢
 
 - **团队**：生产队的大萝卜，华中科技大学
-- **指导老师**：周建、吴飞
-- **特别感谢**：唐旻翰、赖永烨、邓浩宇、张时宇
+- **指导老师**：周建、吴菲
+- **特别感谢**：唐岷瀚、赖永烨、邓皓宇、张诗语
 - 基于 [华为云 ModelArts](https://www.huaweicloud.com/product/modelarts.html)、[NVIDIA DeepStream](https://developer.nvidia.com/deepstream-sdk) 和 [YOLOv5](https://github.com/ultralytics/yolov5) 构建
 
 ---
 
-恭喜赖永烨、陈学嘉等同学在 [第19届挑战杯华为云赛道](https://github.com/HUSTMiracle/BLBDGCD_huawei2024) 中荣获**特等奖**！
+恭喜赖永烨、陈薛嘉等同学在 [第19届挑战杯华为云赛道](https://github.com/HUSTMiracle/BLBDGCD_huawei2024) 中荣获**特等奖**！

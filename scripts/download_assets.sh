@@ -3,13 +3,13 @@
 # Usage: bash scripts/download_assets.sh
 #
 # Assets are hosted at:
-#   https://github.com/Nobody-Zhang/huaweicloud_2023/releases/download/v1.0/
+#   https://github.com/Nobody-Zhang/DriveVigil/releases/download/v1.0/
 #
 # Run from the repository root directory.
 
 set -euo pipefail
 
-BASE_URL="https://github.com/Nobody-Zhang/huaweicloud_2023/releases/download/v1.0"
+BASE_URL="https://github.com/Nobody-Zhang/DriveVigil/releases/download/v1.0"
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO_ROOT"
 
