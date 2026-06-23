@@ -166,7 +166,7 @@ def detect_rnet(im, dets, thresh):
             img = img.transpose((2, 0, 1))
             img = (img - 127.5) / 128
             cropped_ims[i, :, :, :] = img
-        except:
+        except Exception:
             continue
     cls_scores, reg = predict_rnet(cropped_ims)
     cls_scores = cls_scores[:, 1]

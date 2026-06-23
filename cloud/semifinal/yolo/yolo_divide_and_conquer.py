@@ -303,7 +303,6 @@ def yolo_run(
     visualize: bool = False,  # visualize features
     half: bool = False,  # use FP16 half-precision inference
     dnn: bool = False,  # use OpenCV DNN for ONNX inference
-    frame_per_second: int = 2,  # 分治的中间向左右的帧率
     iou_presice_b_search: float = 0.05,  # 二分时间误差系数，准确率优先，给到0.05
 ) -> Dict[str, Any]:
     """Run YOLO inference with divide-and-conquer temporal localization.
@@ -339,8 +338,6 @@ def yolo_run(
         visualize: If True, visualize feature maps.
         half: If True, use FP16 half-precision inference.
         dnn: If True, use OpenCV DNN backend for ONNX.
-        frame_per_second: Probe rate for the divide-and-conquer
-            expansion phase (probes per second).
         iou_presice_b_search: Binary search error coefficient — lower
             values give tighter temporal boundaries at the cost of more
             inference calls. 0.05 prioritizes accuracy.
@@ -367,7 +364,7 @@ def yolo_run(
     # ------------------------- Init model -------------------------
     device = select_device(device)
     model = DetectMultiBackend(weights, device=device, dnn=dnn, data=data)
-    stride, names, pt, jit, onnx, engine = model.stride, model.names, model.pt, model.jit, model.onnx, model.engine
+    stride, pt, jit, onnx, engine = model.stride, model.pt, model.jit, model.onnx, model.engine
     imgsz = check_img_size(imgsz, s=stride)  # check image size
     half &= (pt or jit or onnx or engine) and device.type != "cpu"  # FP16 supported on limited backends with CUDA
     if pt or jit:
@@ -375,11 +372,7 @@ def yolo_run(
     bs = 1  # batch_size
     dataset = LoadImages(source, img_size=imgsz, stride=stride, auto=pt)
     model.warmup(imgsz=(1 if pt else bs, 3, *imgsz), half=half)  # warmup
-    dt, seen = [0.0, 0.0, 0.0], 0
     fps = dataset.cap.get(cv2.CAP_PROP_FPS)
-    FRAME_GROUP = int(fps / frame_per_second)
-    # fps = FRAME_PER_SECOND
-    cntt = -1
     im_lis = load_imgs(dataset, half, device)  # 保存所有的帧便于后续分治
     tmp: List[List[Any]] = []
     sta_tmp: Dict[int, int] = {}
@@ -514,12 +507,12 @@ def yolo_run(
 
         return [False]  # Fixed: defensive fallback for theoretically unreachable state
 
-    def divide_and_conquer(l: int, r: int) -> None:
+    def divide_and_conquer(lo: int, hi: int) -> None:
         """Recursively partition the video timeline to find behavior segments.
 
         This is the core temporal localization algorithm. It works by:
 
-        1. **Probe**: classify the middle frame of the segment ``[l, r]``.
+        1. **Probe**: classify the middle frame of the segment ``[lo, hi]``.
         2. **Expand**: if the middle frame shows a dangerous behavior,
            step outward in 0.375-second increments to estimate how far
            the behavior extends in both directions.
@@ -532,26 +525,26 @@ def yolo_run(
         as they cannot contain a valid behavior period.
 
         Args:
-            l: Left boundary frame index (inclusive).
-            r: Right boundary frame index (inclusive).
+            lo: Left boundary frame index (inclusive).
+            hi: Right boundary frame index (inclusive).
         """
-        # 分治算法，l和r表示的是左右的边界, [l, r]，且左右的状态和l - 0.5 * fps, r + 0.5 * fps的状态不一样
-        if r - l < 3 * fps:  # 区间小于3s
+        # 分治算法，lo和hi表示的是左右的边界, [lo, hi]，且左右的状态和lo - 0.5 * fps, hi + 0.5 * fps的状态不一样
+        if hi - lo < 3 * fps:  # 区间小于3s
             return
-        mid = int((l + r) / 2)  # 选中间的帧
+        mid = int((lo + hi) / 2)  # 选中间的帧
         sta_mid = f(mid)
         i = 1
         j = 1
         if sta_mid != 0:
-            while int(mid - 0.375 * i * fps) >= l and f(int(mid - 0.375 * i * fps)) == sta_mid:
+            while int(mid - 0.375 * i * fps) >= lo and f(int(mid - 0.375 * i * fps)) == sta_mid:
                 i += 1
-            while int(mid + 0.375 * j * fps) <= r and f(int(mid + 0.375 * j * fps)) == sta_mid:
+            while int(mid + 0.375 * j * fps) <= hi and f(int(mid + 0.375 * j * fps)) == sta_mid:
                 j += 1
             if i + j >= 9:  # 表示当前已经有2.625s，但是需要更进一步二分判断
                 # 注意保存的是l1，r2的帧，因为这俩都判断是不可行的
                 tmp.append([i + j == 9, int(mid - 0.375 * i * fps), int(mid + 0.375 * j * fps), sta_mid])
-        divide_and_conquer(l, int(mid - fps * i * 0.375))
-        divide_and_conquer(int(mid + fps * j * 0.375), r)
+        divide_and_conquer(lo, int(mid - fps * i * 0.375))
+        divide_and_conquer(int(mid + fps * j * 0.375), hi)
         return
 
     # ------------------------- Run inference -------------------------
@@ -563,7 +556,6 @@ def yolo_run(
     # tot_status.append(0)  # 为了最后一个状态的判断，需要多加一个0
     # Post process, using the sliding window algorithm to judge the final status
     res: List[Dict[str, Any]] = []
-    pre_i = 0  # 上个状态的起始帧（抽帧之后的 -----> FRAME_PER_SECOND）
     # 每一帧（抽帧之后的）遍历
     tmp.sort(key=lambda x: x[1])
     for i in tmp:

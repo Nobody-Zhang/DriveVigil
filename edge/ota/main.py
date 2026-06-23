@@ -47,7 +47,8 @@ boot_file = "/auto-train-jyf/yoloV5/yolov5/train.py"
 # 数据集在obs中的位置，也是上传的位置
 input_dir = "/" + bucket_name + "/" + upload_dir
 # 训练结果在obs中的位置，也是要下载的位置
-# 注意，在训练结束后，需要执行类似os.system("cp -r ./runs/train/output/* ../../output/")的命令，前者是训练结果存放的目录，一般为./runs/train/exp,后者不需要改动
+# 注意，在训练结束后，需要执行类似os.system("cp -r ./runs/train/output/* ../../output/")的命令，
+# 前者是训练结果存放的目录，一般为./runs/train/exp,后者不需要改动
 output_dir = "/auto-train-jyf/yoloV5/output/"
 
 
@@ -150,7 +151,11 @@ def create_training_job() -> Tuple[int, str]:
         + '"'
         + output_dir
         + '"'
-        + '}}}],"engine":{"engine_name":"PyTorch","engine_version":"pytorch_1.8.0-cuda_10.2-py_3.7-ubuntu_18.04-x86_64"},"local_code_dir":"/home/ma-user/modelarts/user-job-dir","working_dir":"/home/ma-user/modelarts/user-job-dir"},"spec":{"resource":{"flavor_id":"modelarts.p3.large.public.free","node_count":1}}}'
+        + '}}}],"engine":{"engine_name":"PyTorch","engine_version":'
+        + '"pytorch_1.8.0-cuda_10.2-py_3.7-ubuntu_18.04-x86_64"},'
+        + '"local_code_dir":"/home/ma-user/modelarts/user-job-dir",'
+        + '"working_dir":"/home/ma-user/modelarts/user-job-dir"},'
+        + '"spec":{"resource":{"flavor_id":"modelarts.p3.large.public.free","node_count":1}}}'
     )
     r.body = payload
     sig.Sign(r)
@@ -210,7 +215,7 @@ def ota() -> None:
         exit()
     logger.info("Training job created, job_id: %s", job_id)
     logger.info("Training status will be checked every 30 seconds...")
-    while check_job_status(job_id) == False:
+    while not check_job_status(job_id):
         time.sleep(30)
     # 从OBS下载权重到本地
     logger.info("Training job finished.")

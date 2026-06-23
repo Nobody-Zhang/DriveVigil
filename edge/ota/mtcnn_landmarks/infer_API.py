@@ -180,7 +180,7 @@ def detect_rnet(im, dets, thresh, device):
             img = img.transpose((2, 0, 1))
             img = (img - 127.5) / 128
             cropped_ims[i, :, :, :] = img
-        except:
+        except Exception:
             continue
     cls_scores, reg = predict_rnet(cropped_ims, device=device)
     cls_scores = cls_scores[:, 1]
@@ -312,9 +312,6 @@ def infer_video(video_path, device, fps=None):
         fps = cap.get(cv2.CAP_PROP_FPS)  # 获取视频帧率
     else:
         cap.set(cv2.CAP_PROP_FPS, fps)
-
-    size = (int(cap.get(cv2.CAP_PROP_FRAME_WIDTH)), int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT)))  # 获取视频尺寸
-    fourcc = cv2.VideoWriter_fourcc(*"mp4v")  # 设置视频编码器
 
     c_roll = None
     c_yaw = None

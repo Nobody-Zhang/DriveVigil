@@ -1,4 +1,4 @@
-name: Lint
+name: CI
 
 on:
   push:
@@ -7,7 +7,28 @@ on:
     branches: [main]
 
 jobs:
-  ruff:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      # ruff is a self-contained binary; the host Python version does not affect
+      # results (the lint target is pinned to py38 in pyproject.toml). The ruff
+      # version is pinned to match .pre-commit-config.yaml and requirements-dev.txt.
+      - name: Install ruff
+        run: pip install ruff==0.15.17
+
+      - name: Ruff check
+        run: ruff check .
+
+      - name: Ruff format check
+        run: ruff format --check .
+
+  test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -16,11 +37,11 @@ jobs:
         with:
           python-version: "3.8"
 
-      - name: Install ruff
-        run: pip install ruff
+      # The suite tests pure, dependency-light logic (the per-frame classifier
+      # and geometry helpers) -- no torch/cv2/CUDA. requirements-dev.txt is the
+      # single source for the dev/test toolchain (pytest, ruff).
+      - name: Install test dependencies
+        run: pip install -r requirements-dev.txt
 
-      - name: Ruff check
-        run: ruff check .
-
-      - name: Ruff format check
-        run: ruff format --check .
+      - name: Run tests
+        run: pytest

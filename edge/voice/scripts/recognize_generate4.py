@@ -1,9 +1,12 @@
 """
 this file is intended to recieve the audio from the user and then generate the response according to the audio
-there are to options for generating the answer, one is using the self_deployed llama model, the other is using the api proveide by ali 通义千问
-note that if the answer generated is not likely to be correct or even not generated, the program will inform the user its incapability
+there are to options for generating the answer, one is using the self_deployed llama model,
+the other is using the api proveide by ali 通义千问
+note that if the answer generated is not likely to be correct or even not generated,
+the program will inform the user its incapability
 
-in consideration of time, we intend to response specific answer with pre_prepared audio, and the general answer with llama or 通义千问
+in consideration of time, we intend to response specific answer with pre_prepared audio,
+and the general answer with llama or 通义千问
 """
 
 import json
@@ -147,7 +150,8 @@ class VoiceInteraction:
      you need first initiated the llama.cpp/server so that the server will be initiated,
      then,open a terminal and type in the following command:
     `ssh -f -N -L 8080:localhost:8080 zhoujian@222.20.97.89 -p 11224` and then type in the password of the server
-    if the port 8080 is not available on server "zhoujian",then pick another port and change the first 8080 to the port you choose,
+    if the port 8080 is not available on server "zhoujian",then pick another port
+    and change the first 8080 to the port you choose,
     if the port 8080 is not available on local device, choose another port and change the second 8080 in the command
     either change should be made in the `__init__` method below as well
     """
@@ -283,7 +287,8 @@ class VoiceInteraction:
         """
         speech synthesis function that generate and play an audio from a given text
         :param given_text: the text that is going to be generated into an audio and played
-        :param temp_path: the path that is used to temporarily store the wav and will be deleted when tht audio is played
+        :param temp_path: the path that is used to temporarily store the wav and will be deleted
+            when tht audio is played
         """
 
         text = given_text
@@ -313,7 +318,7 @@ class VoiceInteraction:
         # 设置保存路径，只有设置保存，此参数才生效
         ttsc_request.set_saved_path(temp_path)
         # step3 发送请求，返回结果。如果设置保存，可在指定路径里查看保存的音频。
-        result = ttsc_client.get_ttsc_response(ttsc_request)
+        ttsc_client.get_ttsc_response(ttsc_request)
         # 使用AudioSegment不正确无法在板子上跑
         song = AudioSegment.from_wav(temp_path)
         play(song)
@@ -426,7 +431,7 @@ class VoiceInteraction:
         """
         global record_socket
         inference_text = self.SASR(audio)
-        if inference_text == None:
+        if inference_text is None:
             song = AudioSegment.from_wav("/home/jetson/Documents/VoiceInteraction/audio_bags/再说一次.wav")
             play(song)
             return 1

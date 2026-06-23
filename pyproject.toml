@@ -1,23 +1,47 @@
 [tool.ruff]
 line-length = 120
 target-version = "py38"
+# Excluded trees are third-party/vendored or archival competition code that we
+# keep verbatim and do not hold to the project's lint standard.
 exclude = [
+    # Vendored Ultralytics YOLOv5 (models/utils live under every yolo/ tree; the
+    # upstream export.py also sits at yolo/export.py next to our own code).
     "**/yolo/utils/",
     "**/yolo/models/",
+    "**/yolo/export.py",
     "edge/cloud_finetune/yolov5/",
+    # Vendored Huawei SDKs.
     "edge/voice/huaweicloud-python-sdk-sis-1.8.1/",
-    "edge/deepstream/utils/",
-    "edge/deepstream/apig_sdk/",
     "edge/apigw/apig_sdk/",
     "edge/ota/apig_sdk/",
+    # Jetson edge code: a vendored fork of marcoslucianops/DeepStream-Yolo plus
+    # many one-off competition experiment scripts (test*.py, try*.py, gpt*.py).
+    # Hardware-bound and archival -- not part of the maintained, portable surface.
+    "edge/deepstream/",
+    # Vendored MTCNN helper trees.
     "edge/mtcnn/utils/",
     "edge/ota/mtcnn_landmarks/utils/",
+    # Prebuilt Vue SPA.
     "edge/frontend/",
 ]
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I"]
+# Ignored repo-wide because they are pervasive, intentional patterns in this
+# ML/edge codebase rather than real defects:
+#   E402 - modules append to sys.path at runtime before importing vendored YOLO/
+#          MTCNN packages, so imports legitimately follow executable statements.
+#   F403/F405 - entry scripts use `from ... import *` against vendored YOLO/MTCNN
+#               utils; enumerating those names is impractical and upstream-owned.
+ignore = ["E402", "F403", "F405"]
 
 [tool.ruff.lint.per-file-ignores]
 "**/yolo/utils/**" = ["ALL"]
 "**/yolo/models/**" = ["ALL"]
+
+[tool.pytest.ini_options]
+# Only collect the project's own tests; the edge/ tree contains many competition
+# scratch scripts named test*.py that are not pytest tests and import hardware
+# libraries (GStreamer, cv2) unavailable off-device.
+testpaths = ["tests"]
+addopts = "-q"

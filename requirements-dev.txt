@@ -1,0 +1,11 @@
+# Development & test dependencies.
+#
+# Install into the project virtualenv (NOT global Python):
+#   python -m venv .venv
+#   .venv/bin/pip install -r requirements-dev.txt
+#
+# Runtime dependencies live in requirements.txt; these are only needed for
+# linting, formatting, and running the test suite.
+
+pytest>=7.0
+ruff==0.15.17  # keep in sync with .pre-commit-config.yaml and the CI workflow
